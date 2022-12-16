@@ -1,6 +1,5 @@
 // useState: greeting
 // http://localhost:3000/isolated/exercise/01.js
-//Prueba de repo
 import * as React from 'react'
 
 function Greeting() {
