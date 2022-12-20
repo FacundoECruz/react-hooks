@@ -36,9 +36,14 @@ function Board({onClick, squares}) {
 
 function Game() {
 
-  const [currentStep, setCurrentStep] = React.useState(0)
-  const [history, setHistory] = React.useState([Array(9).fill(null)])
-
+  const [currentStep, setCurrentStep] = useLocalStorageState(
+    'tic-tac-toe:step',
+    0,
+    )
+  const [history, setHistory] = useLocalStorageState('tic-tac-toe:history',[
+    Array(9).fill(null), 
+  ])
+    
   const currentSquares = history[currentStep]
   const nextValue = calculateNextValue(currentSquares)
   const winner = calculateWinner(currentSquares)
