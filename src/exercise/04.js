@@ -4,14 +4,44 @@
 import * as React from 'react'
 import {useLocalStorageState} from '../utils.js'
 
-function Board() {
+function Board({onClick, squares}) {
+  function renderSquare(i) {
+    return (
+      <button className="square" onClick={() => onClick(i)}>
+        {squares[i]}
+      </button>
+    )
+  }
+
+  return (
+    <div>
+      <div className="board-row">
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
+      </div>
+      <div className="board-row">
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </div>
+      <div className="board-row">
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+      </div>
+    </div>
+  )
+}
+
+function Game() {
   const [squares, setSquares] = useLocalStorageState(
     'squares',
     Array(9).fill(null),
   )
-  // const [nextValue, setNextValue] = React.useState(calculateNextValue(squares))
-  // const [winner, setWinner] = React.useState(calculateWinner(squares))
-  // const [status, setStatus] = React.useState(calculateStatus(squares))
+
+  const currentStep = 0
+  const history = [squares]
 
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
@@ -30,44 +60,29 @@ function Board() {
     setSquares(Array(9).fill(null))
   }
 
-  function renderSquare(i) {
+  const moves = history.map((stepSquares, step) => {
+    const desc = step === 0 ? 'Go to game start' : `Go to move #${step}`
+    const isCurrentStep = step === currentStep
     return (
-      <button className="square" onClick={() => selectSquare(i)}>
-        {squares[i]}
-      </button>
+      <li key={step}>
+        <button disabled={isCurrentStep}>
+          {desc} {isCurrentStep ? '(current)' : null}
+        </button>
+      </li>
     )
-  }
+  })
 
-  return (
-    <div>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
-      </div>
-      <div className="board-row">
-        {renderSquare(3)}
-        {renderSquare(4)}
-        {renderSquare(5)}
-      </div>
-      <div className="board-row">
-        {renderSquare(6)}
-        {renderSquare(7)}
-        {renderSquare(8)}
-      </div>
-      <button className="restart" onClick={restart}>
-        restart
-      </button>
-    </div>
-  )
-}
-
-function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <Board onClick={selectSquare} squares={squares} />
+        <button className="restart" onClick={restart}>
+          restart
+        </button>
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <ol>{moves}</ol>
       </div>
     </div>
   )
