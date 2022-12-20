@@ -35,29 +35,31 @@ function Board({onClick, squares}) {
 }
 
 function Game() {
-  const [squares, setSquares] = useLocalStorageState(
-    'squares',
-    Array(9).fill(null),
-  )
 
-  const currentStep = 0
-  const history = [squares]
+  const [currentStep, setCurrentStep] = React.useState(0)
+  const [history, setHistory] = React.useState([Array(9).fill(null)])
 
-  const nextValue = calculateNextValue(squares)
-  const winner = calculateWinner(squares)
-  const status = calculateStatus(winner, squares, nextValue)
+  const currentSquares = history[currentStep]
+  const nextValue = calculateNextValue(currentSquares)
+  const winner = calculateWinner(currentSquares)
+  const status = calculateStatus(winner, currentSquares, nextValue)
 
   function selectSquare(square) {
-    if (winner || squares[square]) {
+    if (winner || currentSquares[square]) {
       return
     }
-    const squaresCopy = [...squares]
+    
+    const newHistory = history.slice(0, currentStep + 1)
+    const squaresCopy = [...currentSquares]
     squaresCopy[square] = nextValue
-    setSquares(squaresCopy)
+
+    setHistory([...newHistory, squaresCopy])
+    setCurrentStep(newHistory.length)
   }
 
   function restart() {
-    setSquares(Array(9).fill(null))
+    setHistory([Array(9).fill(null)])
+    setCurrentStep(0)
   }
 
   const moves = history.map((stepSquares, step) => {
@@ -65,7 +67,7 @@ function Game() {
     const isCurrentStep = step === currentStep
     return (
       <li key={step}>
-        <button disabled={isCurrentStep}>
+        <button disabled={isCurrentStep} onClick={() => setCurrentStep(step)}>
           {desc} {isCurrentStep ? '(current)' : null}
         </button>
       </li>
@@ -75,7 +77,7 @@ function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board onClick={selectSquare} squares={squares} />
+        <Board onClick={selectSquare} squares={currentSquares} />
         <button className="restart" onClick={restart}>
           restart
         </button>
